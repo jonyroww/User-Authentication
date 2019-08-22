@@ -2,6 +2,8 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+
 
 
 //Sign-in
@@ -15,7 +17,9 @@ router.post('/login', async (req, res) => {
     try {
         const isPasswordValid = await bcrypt.compare(req.body.password, user.password)
         if (isPasswordValid) {
-            res.send('success')
+            const token = jwt.sign({email: req.body.email, exp: Math.floor(Date.now() / 1000) + (60 * 60)},'pizdahuizhopa')
+            res.send({token:token})
+            console.log(token)
         } else {
             res.send('Not allowed')
         }

@@ -1,10 +1,11 @@
+require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
 
 
 
-mongoose.connect('mongodb://localhost:27017/users', { useNewUrlParser: true })
+mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
 const db = mongoose.connection
 db.on('error', (error) => console.error(error))
 db.once('open', () => console.log('Connected to database'))
@@ -17,7 +18,7 @@ const usersRouter = require('./routers/users')
 
 app.use(signUpRouter)
 app.use(signInRouter)
-app.use(usersRouter)
+app.use('/users', usersRouter)
 
 
 app.listen(3000, () => {

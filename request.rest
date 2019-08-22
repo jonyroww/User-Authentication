@@ -2,12 +2,21 @@ GET http://localhost:3000/users
 
 ###
 
+GET http://localhost:3000/users/5d5d459ffe68ae0d6c088061
+
+###
+
+DELETE http://localhost:3000/users/5d5d66b24760e919b4c6c3b7
+
+
+###
+
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "name": "Fedor",
-  "email": "Fedya@mail.ru",
+  "name": "Dgeh",
+  "email": "dikon@mail.ru",
   "password": "password"
 }
 
