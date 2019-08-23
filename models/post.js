@@ -2,27 +2,28 @@ const mongoose = require('mongoose')
 
 const postSchema = new mongoose.Schema({
     text:{
-        type:String,
-        required:true
+        type: String,
+        required: true
     },
     creationDate:{
-        type:Date,
-        required:true
+        type: Date,
+        default: Date.now
     },
 
     creator: {
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
 
     likes:{
-        type:Number,
-        required:true
+        type: Number,
+        default: 0
     },
 
     dislikes:{
         type:Number,
-        required:true
+        default: 0
     }
          
 })

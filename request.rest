@@ -3,9 +3,9 @@ GET http://localhost:3000/users
 
 ###
 //Getting one
-GET http://localhost:3000/users/5d5d459ffe68ae0d6c088061
-
+GET http://localhost:3000/users/5d5ead9301912329f0787117
 ###
+
 //Deleting one
 DELETE http://localhost:3000/users/5d5d66b24760e919b4c6c3b7
 
@@ -44,3 +44,19 @@ Content-Type: application/json
 
 //Getting all posts
 GET http://localhost:3000/posts
+
+###
+
+//Creating post
+POST http://localhost:3000/posts
+Content-Type: application/json
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpa29uc0BtYWlsLnJ1IiwiZXhwIjoxNTY2NTg2MTg1LCJpYXQiOjE1NjY1ODI1ODV9.bXI7Ccv63cX9brwIZ0k2aMzVDlAFNiabZsuTgXCncRE
+
+{
+  "text": "spigjoerhgoerhoer;orwg othgo ho 3io5hjo35h o35hj"
+}
+
+###
+
+//Getting one post
+GET http://localhost:3000/posts/5d602a5f1274ab2480186298

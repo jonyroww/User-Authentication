@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const User = require('../models/user')
 const validationUtils = require('../utils/validation-utils')
+const Post = require('../models/post')
 
 //Getting all
 router.get('/', async (req,res) => {
@@ -16,8 +17,23 @@ router.get('/', async (req,res) => {
 
 
 //Getting one user
-router.get('/:id', getUser, (req, res) => {
-    res.send(res.user)
+router.get('/:id', getUser, async (req, res) => {
+    const posts = await Post.find({
+        _id: res.user.posts 
+    })
+    const hui = res.user.posts 
+    console.log(hui)
+    console.log(posts)
+
+    const userWithPosts = {
+            posts: posts,
+            name: res.user.name,
+            email:res.user.email
+        }
+     
+
+    
+    res.json(userWithPosts)
 })
 
 //Deleting user
@@ -41,10 +57,14 @@ router.post('/:id',getUser, async (req, res) => {
     }
 })
 
+
+
 //Getting all posts
 router.get('/posts/:id',getUser, async (req, res) => {
     res.send(res.user.posts)
 })
+
+
 
 
 
