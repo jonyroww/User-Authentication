@@ -9,15 +9,13 @@ router.get('/', async (req,res) => {
         const users = await User.find()
         validationUtils.isTokenValid(req.headers['x-access-token'])
         res.send(users)
-        
-        
     } catch (err) {
         res.status(500).json({message:err.message})
     }
 })
 
 
-//Getting one
+//Getting one user
 router.get('/:id', getUser, (req, res) => {
     res.send(res.user)
 })
@@ -33,7 +31,7 @@ router.delete('/:id', getUser, async (req, res) => {
 })
 
 //Updating user
-router.post('/:id',getUser, async (req,res) => {
+router.post('/:id',getUser, async (req, res) => {
     res.user.name = req.body.name
     try {
         const updatedUser = await res.user.save()
@@ -42,6 +40,13 @@ router.post('/:id',getUser, async (req,res) => {
         res.status(400).json({message:err.message})
     }
 })
+
+//Getting all posts
+router.get('/posts/:id',getUser, async (req, res) => {
+    res.send(res.user.posts)
+})
+
+
 
 async function getUser (req, res, next){
 let user 

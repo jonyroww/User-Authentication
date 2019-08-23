@@ -15,10 +15,12 @@ app.use(express.json())
 const signUpRouter = require('./routers/sign-up')
 const signInRouter = require('./routers/sign-in')
 const usersRouter = require('./routers/users')
+const postsRouter = require('./routers/posts')
 
 app.use(signUpRouter)
 app.use(signInRouter)
 app.use('/users', usersRouter)
+app.use('/posts',postsRouter)
 
 
 app.listen(3000, () => {

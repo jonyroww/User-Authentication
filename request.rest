@@ -1,31 +1,46 @@
+//Getting all
 GET http://localhost:3000/users
 
 ###
-
+//Getting one
 GET http://localhost:3000/users/5d5d459ffe68ae0d6c088061
 
 ###
-
+//Deleting one
 DELETE http://localhost:3000/users/5d5d66b24760e919b4c6c3b7
 
 
 ###
-
+//sign-up
 POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "name": "Dgeh",
-  "email": "dikon@mail.ru",
-  "password": "password"
+  "name": "Nikita",
+  "email": "dikons@mail.ru",
+  "password": "12345"
 }
 
 ###
-
+//sign-in
 POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "Nikita",
-  "password": "passwor"
+  "email": "dikons@mail.ru",
+  "password": "12345"
 }
+
+###
+//Updating one
+POST http://localhost:3000/users/5d5d4781380e4e0b88e8b203
+Content-Type: application/json
+
+{
+  "name": "Dr6546546464"
+}
+
+###
+
+//Getting all posts
+GET http://localhost:3000/posts
