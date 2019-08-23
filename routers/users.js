@@ -21,18 +21,13 @@ router.get('/:id', getUser, async (req, res) => {
     const posts = await Post.find({
         _id: res.user.posts 
     })
-    const hui = res.user.posts 
-    console.log(hui)
-    console.log(posts)
-
+    
     const userWithPosts = {
             posts: posts,
             name: res.user.name,
             email:res.user.email
         }
      
-
-    
     res.json(userWithPosts)
 })
 
