@@ -27,8 +27,11 @@ function isValidPassword(pass) {
 }
 
 function isTokenValid(token) {
-  if (jwt.verify(token,'pizdahuizhopa').email === null) {
+  const email = jwt.verify(token,'pizdahuizhopa').email
+  if (email === null) {
     throw new Error('Token is not valid')
+  } else {
+    return email
   }
 }
 

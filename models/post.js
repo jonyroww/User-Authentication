@@ -24,8 +24,17 @@ const postSchema = new mongoose.Schema({
     dislikes:{
         type:Number,
         default: 0
-    }
-         
+    },
+
+    tags: [{
+
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'Tag'
+        
+       }  
+    ]
+
+  
 })
 
 

@@ -1,13 +1,13 @@
-//Getting all
+//Getting all users
 GET http://localhost:3000/users
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZvdmFAbWFpbC5ydSIsImV4cCI6MTU2NjkxNzYxOSwiaWF0IjoxNTY2OTE0MDE5fQ.-AbPPx_iwQHYD8krHM4C2jgARwnA9fb40-CiRNmgQp4
 
 ###
-//Getting one
-GET http://localhost:3000/users/5d5ead9301912329f0787117
-###
+//Getting user
+GET http://localhost:3000/users/5d6535dd11d21b269805d219
 
-//Deleting one
-DELETE http://localhost:3000/users/5d5d66b24760e919b4c6c3b7
+//Deleting user
+DELETE http://localhost:3000/users/5d602f392c0b190734ba8677
 
 
 ###
@@ -16,8 +16,8 @@ POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "name": "Nikita",
-  "email": "dikons@mail.ru",
+  "name": "Vova",
+  "email": "vova@mail.ru",
   "password": "12345"
 }
 
@@ -27,12 +27,12 @@ POST http://localhost:3000/login
 Content-Type: application/json
 
 {
-  "email": "dikons@mail.ru",
+  "email": "vova@mail.ru",
   "password": "12345"
 }
 
 ###
-//Updating one
+//Updating user
 POST http://localhost:3000/users/5d5d4781380e4e0b88e8b203
 Content-Type: application/json
 
@@ -47,16 +47,42 @@ GET http://localhost:3000/posts
 
 ###
 
+//Getting all posts of user
+GET http://localhost:3000/users/posts/5d6535dd11d21b269805d219
+
+###
+
 //Creating post
 POST http://localhost:3000/posts
 Content-Type: application/json
-x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImRpa29uc0BtYWlsLnJ1IiwiZXhwIjoxNTY2NTg2MTg1LCJpYXQiOjE1NjY1ODI1ODV9.bXI7Ccv63cX9brwIZ0k2aMzVDlAFNiabZsuTgXCncRE
+x-access-token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InZvdmFAbWFpbC5ydSIsImV4cCI6MTU2NjkyNTE4OSwiaWF0IjoxNTY2OTIxNTg5fQ.ym8l1ZcKz4braKypamrFNCQSFL-Dr_7_q5ujAenrv_A
 
 {
-  "text": "spigjoerhgoerhoer;orwg othgo ho 3io5hjo35h o35hj"
+  "text": "4646786786786",
+  "tags": "/b,корзинка,/news"
 }
 
 ###
 
 //Getting one post
-GET http://localhost:3000/posts/5d602a5f1274ab2480186298
+GET  http://localhost:3000/posts/5d65550d2fad0d24d8d79706
+
+###
+
+//Updating post 
+POST http://localhost:3000/posts/5d6538397ae6cb13445b2738/edit
+Content-Type: application/json
+
+{
+  "text": "sic parvis magna"
+}
+
+###
+
+//Deleting post
+DELETE http://localhost:3000/posts/5d6538407ae6cb13445b273a
+
+###
+
+//Get tags
+GET http://localhost:3000/tags

@@ -19,7 +19,7 @@ router.post('/login', async (req, res) => {
         if (isPasswordValid) {
             const token = jwt.sign({email: req.body.email, exp: Math.floor(Date.now() / 1000) + (60 * 60)},'pizdahuizhopa')
             res.send({token:token})
-            console.log(token)
+            
         } else {
             res.send('Not allowed')
         }
