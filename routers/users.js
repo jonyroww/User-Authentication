@@ -56,7 +56,6 @@ router.post('/:id',getUser, async (req, res) => {
 router.get('/posts/:id',getUser, async (req, res) => {
     const postIds =  res.user.posts
     const posts = await Post.find({_id:postIds})
-    //console.log(posts)
     res.send(posts)
 })
 
