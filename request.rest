@@ -84,5 +84,19 @@ DELETE http://localhost:3000/posts/5d6538407ae6cb13445b273a
 
 ###
 
-//Get tags
+//Get all tags
 GET http://localhost:3000/tags
+
+###
+
+//Deleting tag
+DELETE http://localhost:3000/tags/5d655351806cea24d80f47b8
+
+###
+//Search by text
+POST http://localhost:3000/posts/search
+Content-Type: application/json
+
+{
+  "text": "parvis"
+}

@@ -23,7 +23,7 @@ app.use(signUpRouter)
 app.use(signInRouter)
 app.use('/users', usersRouter)
 app.use('/posts',postsRouter)
-app.use(tagsRouter)
+app.use('/tags',tagsRouter)
 
 
 app.listen(3000, () => {

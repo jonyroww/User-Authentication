@@ -1,21 +1,23 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../models/user')
-const Post = require('../models/post')
-const Tag = require('../models/tag')
+const PostAPI = require('../Models/API/PostAPI')
+const User = require('../Models/DB/UserDB')
+const PostDB = require('../Models/DB/PostDB')
+const Tag = require('../Models/DB/TagDB')
 const jwt = require('jsonwebtoken')
+
 
 //Getting all posts
 router.get('/', async (req,res) => {
+
     try {
-        const posts = await Post.find()
-        let newPosts = []
-        for (post of posts) {
+        const posts = await PostDB.find()
+        let newPostDBs = []
+
+        for (let post of posts) {
             const user = await User.findOne({_id: post.creator})
             const tags = await Tag.find({_id: post.tags}) 
-            console.log(post)
-            console.log(user)
-            newPosts.push({
+            newPostDBs.push({
                 id: post._id,
                 text: post.text,
                 creationDate: post.creationDate,
@@ -28,14 +30,14 @@ router.get('/', async (req,res) => {
                 tags: tags
             })
         } 
-        res.json(newPosts)
+        res.json(newPostDBs)
     } catch (err) {
         res.status(500).json({message:err.message})
     }
 })
 
 //Getting one post
-router.get('/:id', getPost, async (req, res) => {
+router.get('/:id', getPostDB, async (req, res) => {
     try {
         const user = await User.findOne({_id: res.post.creator})
         const tags = await Tag.find({_id: res.post.tags})
@@ -72,7 +74,7 @@ router.post('/', async (req, res) => {
         await tags.forEach(tag => tag.save())
        
         const user = await User.findOne({email: email})
-        const post = new Post({
+        const post = new PostDB({
             text: req.body.text,
             creator: user.id
         })
@@ -80,46 +82,67 @@ router.post('/', async (req, res) => {
             await post.tags.push(tag)
         }
          
-        const newPost = await post.save()
-        await user.posts.push(newPost)
+        const newPostDB = await post.save()
+        await user.posts.push(newPostDB)
         await user.save()
-        res.status(201).json(newPost)
+        res.status(201).json(newPostDB)
     } catch (err) {
         res.status(500).json({message:err.message})
     }
 })
 
 //Updating post 
-router.post('/:id/edit', getPost, async (req, res) => {
+router.post('/:id/edit', getPostDB, async (req, res) => {
     res.post.text = req.body.text
     try {
-        const updatedPost = await res.post.save()
-        res.json(updatedPost)
+        const updatedPostDB = await res.post.save()
+        res.json(updatedPostDB)
     } catch (err) {
         res.status(400).json({message:err.message})
     }
 })
 
 //Deleting post
-router.delete('/:id', getPost, async (req, res) => {
+router.delete('/:id', getPostDB, async (req, res) => {
     const userID = res.post.creator
     const user = await User.findById(userID)
-    const indexOfPost = user.posts.indexOf(req.params.id)
-    user.posts.splice(indexOfPost,1)
+    const indexOfPostDB = user.posts.indexOf(req.params.id)
+    user.posts.splice(indexOfPostDB,1)
     try {
         await user.save()
-        await Post.deleteOne({_id:req.params.id})
-        res.json({message:'Post was deleted'})
+        await PostDB.deleteOne({_id:req.params.id})
+        res.json({message:'PostDB was deleted'})
     } catch (err) {
         res.status(500).json({message:err.message})
     }
 } )
 
+//Searching post by text
+router.post('/search', async (req, res) => {
+    try {
+        const posts = await PostDB.find({$text: {$search: req.body.text}})
 
-async function getPost (req, res, next){
+        let newPostDBs = []
+
+        for ( let post of posts) {
+
+            newPostDBs.push({
+
+            })
+        }
+        res.status(200).json(posts)
+    } catch (err) {
+        res.status(500).json({message:err.message})
+    }
+    
+
+})
+
+
+async function getPostDB (req, res, next){
     let post 
     try {
-    post = await Post.findById(req.params.id)
+    post = await PostDB.findById(req.params.id)
     if (post === null) {
         return res.status(404).json({message:'Cannot find post'})
       } 
