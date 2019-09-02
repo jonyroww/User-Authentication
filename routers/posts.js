@@ -1,34 +1,23 @@
 const express = require('express')
 const router = express.Router()
 const PostAPI = require('../Models/API/PostAPI')
-const User = require('../Models/DB/UserDB')
-const PostDB = require('../Models/DB/PostDB')
-const Tag = require('../Models/DB/TagDB')
+const UserSchema = require('../Models/Schemes/UserSchema')
+const PostSchema = require('../Models/Schemes/PostSchema')
+const TagSchema = require('../Models/Schemes/TagSchema')
+const PostTagsSchema = require('../Models/Schemes/QuerySchemes/PostTagsSchema')
+const UserPostsSchema = require('../Models/Schemes/QuerySchemes/UserPostsSchema')
 const jwt = require('jsonwebtoken')
-
 
 //Getting all posts
 router.get('/', async (req,res) => {
-
     try {
-        const posts = await PostDB.find()
+        const posts = await PostSchema.find()
         let newPostDBs = []
-
         for (let post of posts) {
-            const user = await User.findOne({_id: post.creator})
-            const tags = await Tag.find({_id: post.tags}) 
-            newPostDBs.push({
-                id: post._id,
-                text: post.text,
-                creationDate: post.creationDate,
-                creator: {
-                     id: post.creator,
-                     name: user.name
-                },
-                likes: post.likes,
-                dislikes: post.dislikes,
-                tags: tags
-            })
+            const user = await UserSchema.findOne({_id: post.creator})
+            const tagIDs = await PostTagsSchema.findOne({postID: post._id})
+            const tags = await TagSchema.find({_id: tagIDs.tags})
+            newPostDBs.push(PostAPI.initFrom(post, user, tags))
         } 
         res.json(newPostDBs)
     } catch (err) {
@@ -39,53 +28,58 @@ router.get('/', async (req,res) => {
 //Getting one post
 router.get('/:id', getPostDB, async (req, res) => {
     try {
-        const user = await User.findOne({_id: res.post.creator})
-        const tags = await Tag.find({_id: res.post.tags})
-        const postWithCreatorName = {
-            id:res.post._id,
-            text: res.post.text,
-            creationDate: res.post.creationDate,
-            creator: {
-                id: res.post.creator,
-                name: user.name
-                },
-            likes: res.post.likes,
-            dislikes: res.post.dislikes,
-            tags: tags
-            
-        }
-        res.send(postWithCreatorName)
+        const user = await UserSchema.findOne({ _id: res.post.creator })
+        const tagIDs = await PostTagsSchema.findOne({postID: res.post.id})
+        const tags = await TagSchema.find({_id: tagIDs.tags})
+        res.json(PostAPI.initFrom(res.post, user, tags))
 
     } catch (err) {
-
         res.status(500).json({message:err.message})
     }
-    
-    
-    
 })
 
 //Creating post
 router.post('/', async (req, res) => {
-
     try { 
         const email = jwt.verify(req.headers['x-access-token'],'pizdahuizhopa').email
-        const tags = req.body.tags.split(',').map(function(tag) { return new Tag({ title: tag }) }) 
+        const tags = req.body.tags.split(',').map(function(tag) { return new TagSchema({ title: tag }) })
         await tags.forEach(tag => tag.save())
        
-        const user = await User.findOne({email: email})
-        const post = new PostDB({
+        const user = await UserSchema.findOne({email: email})
+        const post = new PostSchema({
             text: req.body.text,
             creator: user.id
         })
-        for (tag of tags) {
-            await post.tags.push(tag)
+        let existPostTagsSchema = await PostTagsSchema.findOne({postID: post._id})
+        if (existPostTagsSchema === null) {
+            existPostTagsSchema = new PostTagsSchema({
+                postID: post._id
+            })
         }
-         
-        const newPostDB = await post.save()
-        await user.posts.push(newPostDB)
+
+        let existUserPostSchema = await UserPostsSchema.findOne({userID: user.id})
+        if (existUserPostSchema === null) {
+            existUserPostSchema = new UserPostsSchema({
+                userID: user._id
+            })
+        }
+        console.log(existPostTagsSchema)
+        console.log(existUserPostSchema)
+        console.log(existPostTagsSchema.tags)
+        await existUserPostSchema.posts.push(post)
+         existPostTagsSchema.tags = []
+        for (let tag of tags) {
+            await existPostTagsSchema.tags.push(tag)
+        }
+
+
+        await existUserPostSchema.save()
+        await post.save()
+        await existPostTagsSchema.save()
         await user.save()
-        res.status(201).json(newPostDB)
+        const postAPI = PostAPI.initFrom(post, user, tags)
+
+        res.status(201).json(postAPI)
     } catch (err) {
         res.status(500).json({message:err.message})
     }
@@ -105,12 +99,12 @@ router.post('/:id/edit', getPostDB, async (req, res) => {
 //Deleting post
 router.delete('/:id', getPostDB, async (req, res) => {
     const userID = res.post.creator
-    const user = await User.findById(userID)
+    const user = await UserSchema.findById(userID)
     const indexOfPostDB = user.posts.indexOf(req.params.id)
     user.posts.splice(indexOfPostDB,1)
     try {
         await user.save()
-        await PostDB.deleteOne({_id:req.params.id})
+        await PostSchema.deleteOne({_id:req.params.id})
         res.json({message:'PostDB was deleted'})
     } catch (err) {
         res.status(500).json({message:err.message})
@@ -119,18 +113,27 @@ router.delete('/:id', getPostDB, async (req, res) => {
 
 //Searching post by text
 router.post('/search', async (req, res) => {
+    const text = req.body.text
     try {
-        const posts = await PostDB.find({$text: {$search: req.body.text}})
+
+        const postArr = await PostSchema.find({$text: {$search: text}})
 
         let newPostDBs = []
 
-        for ( let post of posts) {
-
-            newPostDBs.push({
-
-            })
+        for (let post of postArr) {
+            const tags = await TagSchema.find({_id: post.tags})
+            const user = await UserSchema.findById({_id: post.creator})
+            newPostDBs.push(PostAPI.initFrom(post, user, tags))
         }
-        res.status(200).json(posts)
+
+
+        const tagArr = text.split(',').map(tag => tag.trim())
+
+
+        console.log(tagArr)
+
+
+        res.status(200).json(newPostDBs)
     } catch (err) {
         res.status(500).json({message:err.message})
     }
@@ -139,10 +142,12 @@ router.post('/search', async (req, res) => {
 })
 
 
+
+
 async function getPostDB (req, res, next){
     let post 
     try {
-    post = await PostDB.findById(req.params.id)
+    post = await PostSchema.findById(req.params.id)
     if (post === null) {
         return res.status(404).json({message:'Cannot find post'})
       } 

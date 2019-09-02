@@ -1,31 +1,35 @@
 const express = require('express')
 const router = express.Router()
-const User = require('../Models/DB/UserDB')
+const UserSchema = require('../Models/Schemes/UserSchema')
 const validationUtils = require('../utils/validation-utils')
-const PostDB = require('../Models/DB/PostDB')
+const PostSchema = require('../Models/Schemes/PostSchema')
+const UserPostsSchema = require('../Models/Schemes/QuerySchemes/UserPostsSchema')
+const PostTagsSchema = require('../Models/Schemes/QuerySchemes/PostTagsSchema')
+const UserAPI = require('../Models/API/UserAPI')
+const PostAPI = require('../Models/API/PostAPI')
 
 //Getting all
-router.get('/', async (req,res) => {
+router.get('/', async (req, res) => {
     try {
-        const users = await User.find()
+        const users = await UserSchema.find()
         validationUtils.isTokenValid(req.headers['x-access-token'])
         res.send(users)
     } catch (err) {
-        res.status(500).json({message:err.message})
+        res.status(500).json({message: err.message})
     }
 })
 
 
 //Getting one user
 router.get('/:id', getUser, async (req, res) => {
-    const posts = await PostDB.find({_id: res.user.posts })
-    
-    const userWithPostDBs = {
-            posts: posts,
-            name: res.user.name,
-            email:res.user.email
-        }
-     
+    const userWithPostsIDs = await UserPostsSchema.findOne({userID: res.user._id})
+    const posts = await PostSchema.find({_id: userWithPostsIDs.posts})
+    const tags = await PostTagsSchema.find({postID: posts.map(post => post._id)})
+    const postsApi = []
+    for (const post of posts) {
+        postsApi.push(PostAPI.initFrom(post, res.user, tags))
+    }
+    const userWithPostDBs = UserAPI.initFrom(res.user.name, res.user.email, postsApi)
     res.json(userWithPostDBs)
 })
 
@@ -33,49 +37,45 @@ router.get('/:id', getUser, async (req, res) => {
 router.delete('/:id', getUser, async (req, res) => {
     try {
         await res.user.remove()
-        res.json({message:'User deleted'})
+        res.json({message: 'User deleted'})
     } catch (err) {
-        res.status(500).json({message:err.message})
+        res.status(500).json({message: err.message})
     }
 })
 
 //Updating user
-router.post('/:id',getUser, async (req, res) => {
+router.post('/:id', getUser, async (req, res) => {
     res.user.name = req.body.name
     try {
         const updatedUser = await res.user.save()
         res.json(updatedUser)
     } catch (err) {
-        res.status(400).json({message:err.message})
+        res.status(400).json({message: err.message})
     }
 })
 
 
-
 //Getting all posts
-router.get('/posts/:id',getUser, async (req, res) => {
-    const postIds =  res.user.posts
-    const posts = await PostDB.find({_id:postIds})
+router.get('/posts/:id', getUser, async (req, res) => {
+    const postIds = res.user.posts
+    const posts = await PostSchema.find({_id: postIds})
     res.send(posts)
 })
 
 
+async function getUser(req, res, next) {
+    let user
+    try {
+        user = await UserSchema.findById(req.params.id)
+        if (user === null) {
+            return res.status(404).json({message: 'Cannot find user'})
+        }
 
-
-
-async function getUser (req, res, next){
-let user 
-try {
-user = await User.findById(req.params.id)
-if (user === null) {
-    return res.status(404).json({message:'Cannot find user'})
-  } 
-
-} catch (err) {
-  return res.status(500).json({message:err.message})
-}
-res.user = user
-next()
+    } catch (err) {
+        return res.status(500).json({message: err.message})
+    }
+    res.user = user
+    next()
 }
 
 module.exports = router

@@ -1,6 +1,3 @@
-const User = require('../DB/UserDB')
-const PostDB = require('../DB/PostDB')
-const Tag = require('../DB/TagDB')
 
 
 function initFrom(post, user, tags) {
@@ -18,4 +15,10 @@ function initFrom(post, user, tags) {
     }
 }
 
-module.exports = initFrom
+function initPostFrom() {
+
+}
+
+module.exports = {
+    initFrom: initFrom
+}
