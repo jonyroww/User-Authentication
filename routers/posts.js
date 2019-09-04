@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const PostAPI = require('../Models/API/PostAPI')
+const SearchAPI = require('../Models/API/SearchAPI')
 const UserSchema = require('../Models/Schemes/UserSchema')
 const PostSchema = require('../Models/Schemes/PostSchema')
 const TagSchema = require('../Models/Schemes/TagSchema')
@@ -63,9 +64,6 @@ router.post('/', async (req, res) => {
                 userID: user._id
             })
         }
-        console.log(existPostTagsSchema)
-        console.log(existUserPostSchema)
-        console.log(existPostTagsSchema.tags)
         await existUserPostSchema.posts.push(post)
          existPostTagsSchema.tags = []
         for (let tag of tags) {
@@ -99,13 +97,13 @@ router.post('/:id/edit', getPostDB, async (req, res) => {
 //Deleting post
 router.delete('/:id', getPostDB, async (req, res) => {
     const userID = res.post.creator
-    const user = await UserSchema.findById(userID)
-    const indexOfPostDB = user.posts.indexOf(req.params.id)
+    const user = await UserPostsSchema.findOne({userID: userID})
+    const indexOfPostDB =  user.posts.indexOf(req.params.id)
     user.posts.splice(indexOfPostDB,1)
     try {
         await user.save()
         await PostSchema.deleteOne({_id:req.params.id})
-        res.json({message:'PostDB was deleted'})
+        res.json({message:'Post was deleted'})
     } catch (err) {
         res.status(500).json({message:err.message})
     }
@@ -115,25 +113,35 @@ router.delete('/:id', getPostDB, async (req, res) => {
 router.post('/search', async (req, res) => {
     const text = req.body.text
     try {
-
+        // Text search start
         const postArr = await PostSchema.find({$text: {$search: text}})
 
-        let newPostDBs = []
+        let textSearch = []
 
         for (let post of postArr) {
-            const tags = await TagSchema.find({_id: post.tags})
+            const tagsInPost = await PostTagsSchema.findOne({postID: post._id})
+            const tags = await TagSchema.find({_id: tagsInPost.tags})
             const user = await UserSchema.findById({_id: post.creator})
-            newPostDBs.push(PostAPI.initFrom(post, user, tags))
+            textSearch.push(PostAPI.initFrom(post, user, tags))
         }
+        // Text search end
 
-
+        // Tags search start
         const tagArr = text.split(',').map(tag => tag.trim())
+        const tagsDB = await TagSchema.find({title: tagArr})
+        const postsTags = await PostTagsSchema.find({tags: {$in: tagsDB.map(tagDB => tagDB._id)}})
+        const tagsSearch = await PostSchema.find({_id: postsTags.map(post => post.postID)})
 
+        let tagsSearchResult = []
+        for (let post of tagsSearch) {
+            const tagsInPost = await PostTagsSchema.findOne({postID: post._id})
+            const tags = await TagSchema.find({_id: tagsInPost.tags})
+            const user = await UserSchema.findById({_id: post.creator})
+            tagsSearchResult.push(PostAPI.initFrom(post, user, tags))
+        }
+        // Tags search end
 
-        console.log(tagArr)
-
-
-        res.status(200).json(newPostDBs)
+        res.status(200).json(SearchAPI.initFrom(textSearch, tagsSearchResult))
     } catch (err) {
         res.status(500).json({message:err.message})
     }

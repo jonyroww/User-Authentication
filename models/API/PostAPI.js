@@ -15,9 +15,7 @@ function initFrom(post, user, tags) {
     }
 }
 
-function initPostFrom() {
 
-}
 
 module.exports = {
     initFrom: initFrom
