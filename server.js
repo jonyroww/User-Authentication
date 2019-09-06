@@ -14,6 +14,7 @@ const signInRouter = require('./routers/sign-in')
 const usersRouter = require('./routers/users')
 const postsRouter = require('./routers/posts')
 const tagsRouter = require('./routers/tags')
+const testRouter = require('./routers/test')
 
 app.use(express.json())
 app.use(signUpRouter)
@@ -21,6 +22,7 @@ app.use(signInRouter)
 app.use('/users', usersRouter)
 app.use('/posts',postsRouter)
 app.use('/tags',tagsRouter)
+app.use(testRouter)
 
 app.listen(3000, () => {
     console.log('Server has started')
