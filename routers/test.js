@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const PostTagsSchema = require('../Models/Schemes/QuerySchemes/PostTagsSchema')
-const UserPostsSchema = require('../Models/Schemes/QuerySchemes/UserPostsSchema')
+const PostTagsSchema = require('../models/schemes/query_schemes/PostTagsSchema')
+const UserPostsSchema = require('../models/schemes/query_schemes/UserPostsSchema')
 
 router.get('/test', async (req, res) => {
     try {

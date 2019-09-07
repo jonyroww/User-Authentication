@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const UserSchema = require('../Models/Schemes/UserSchema')
+const UserSchema = require('../models/schemes/UserSchema')
 const bcrypt = require('bcrypt')
 const validationUtils = require('../utils/validation-utils')
 

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
-//const UserSchema = require('../Models/Schemes/UserSchema')
-const TagSchema = require('../Models/Schemes/TagSchema')
+//const UserSchema = require('../models/schemes/UserSchema')
+const TagSchema = require('../models/schemes/TagSchema')
 
 
 //Getting all tags

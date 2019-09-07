@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const UserSchema = require('../Models/Schemes/UserSchema')
+const UserSchema = require('../models/schemes/UserSchema')
 const validationUtils = require('../utils/validation-utils')
-const PostSchema = require('../Models/Schemes/PostSchema')
-const UserPostsSchema = require('../Models/Schemes/QuerySchemes/UserPostsSchema')
-const PostTagsSchema = require('../Models/Schemes/QuerySchemes/PostTagsSchema')
-const UserAPI = require('../Models/API/UserAPI')
-const PostAPI = require('../Models/API/PostAPI')
+const PostSchema = require('../models/schemes/PostSchema')
+const UserPostsSchema = require('../models/schemes/query_schemes/UserPostsSchema')
+const PostTagsSchema = require('../models/schemes/query_schemes/PostTagsSchema')
+const UserAPI = require('../models/api/UserAPI')
+const PostAPI = require('../models/api/PostAPI')
 
 //Getting all
 router.get('/', async (req, res) => {
