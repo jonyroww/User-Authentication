@@ -24,6 +24,6 @@ app.use('/posts',postsRouter)
 app.use('/tags',tagsRouter)
 app.use(testRouter)
 
-app.listen(3000, () => {
+app.listen (process.env.PORT_API,() => {
     console.log('Server has started')
 })
