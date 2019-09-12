@@ -94,6 +94,25 @@ router.post('/:id/edit', getPostDB, async (req, res) => {
     }
 })
 
+//Adding tags to post
+router.post('/:id/edit/tags', getPostDB, async (req, res) => {
+    const tags = req.body.tags.split(',').map(function(tag) { return new TagSchema({ title: tag }) })
+    await tags.forEach(tag => tag.save())
+    try {
+        const postTags = await PostTagsSchema.findOne({postID: res.post._id})
+        tags.map(function (tag) {
+            postTags.tags.push(tag._id)
+        })
+        await res.post.save()
+        await postTags.save()
+        const user = await UserSchema.findOne({_id: res.post.creator})
+        const resultTags = await TagSchema.find({_id: postTags.tags})
+        res.json(PostAPI.initFrom(res.post, user, resultTags))
+    } catch (err) {
+        res.status(400).json({message:err.message})
+    }
+})
+
 //Deleting post
 router.delete('/:id', getPostDB, async (req, res) => {
     const userID = res.post.creator
