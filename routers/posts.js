@@ -103,7 +103,6 @@ router.post('/:id/edit/tags', getPostDB, async (req, res) => {
         tags.map(function (tag) {
             postTags.tags.push(tag._id)
         })
-        await res.post.save()
         await postTags.save()
         const user = await UserSchema.findOne({_id: res.post.creator})
         const resultTags = await TagSchema.find({_id: postTags.tags})
