@@ -112,6 +112,20 @@ router.post('/:id/edit/tags', getPostDB, async (req, res) => {
     }
 })
 
+//Deleting tags from post
+router.delete('/:id/edit/tags', getPostDB, async (req, res) => {
+    const postID = res.post._id
+    const tags = req.body.tags.split(',')
+    try {
+        await TagSchema.deleteMany({title: tags})
+        res.send('Removed')
+    } catch (err) {
+        res.status(400).json({message:err.message})
+    }
+
+
+})
+
 //Deleting post
 router.delete('/:id', getPostDB, async (req, res) => {
     const userID = res.post.creator
