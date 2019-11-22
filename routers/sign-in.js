@@ -8,7 +8,8 @@ const jwt = require('jsonwebtoken')
 
 //Sign-in
 router.post('/login', async (req, res) => {
-    const user = await User.findOne({email:req.body.email})
+    const emailTrim = req.body.email.trim()
+    const user = await User.findOne({email:emailTrim})
 
     if (user === null) {
        return res.status(400).send('Cannot find user')

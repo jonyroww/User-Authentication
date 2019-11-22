@@ -5,15 +5,17 @@ const validationUtils = require('../utils/validation-utils')
 const PostSchema = require('../models/schemes/PostSchema')
 const UserPostsSchema = require('../models/schemes/query_schemes/UserPostsSchema')
 const PostTagsSchema = require('../models/schemes/query_schemes/PostTagsSchema')
-const UserAPI = require('../models/api/UserAPI')
+const TagSchema = require('../models/schemes/TagSchema')
+const UserPostAPI = require('../models/api/UserPostAPI')
 const PostAPI = require('../models/api/PostAPI')
+const UserAPI = require('../models/api/UserAPI')
 
 //Getting all
 router.get('/', async (req, res) => {
     try {
         const users = await UserSchema.find()
         validationUtils.isTokenValid(req.headers['x-access-token'])
-        res.send(users)
+        res.send(UserAPI.initFrom(users))
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -25,11 +27,12 @@ router.get('/:id', getUser, async (req, res) => {
     const userWithPostsIDs = await UserPostsSchema.findOne({userID: res.user._id})
     const posts = await PostSchema.find({_id: userWithPostsIDs.posts})
     const tags = await PostTagsSchema.find({postID: posts.map(post => post._id)})
+
     const postsApi = []
     for (const post of posts) {
         postsApi.push(PostAPI.initFrom(post, res.user, tags))
     }
-    const userWithPostDBs = UserAPI.initFrom(res.user.name, res.user.email, postsApi)
+    const userWithPostDBs = UserPostAPI.initFrom(res.user.name, res.user.email, postsApi)
     res.json(userWithPostDBs)
 })
 
@@ -48,7 +51,12 @@ router.post('/:id', getUser, async (req, res) => {
     res.user.name = req.body.name
     try {
         const updatedUser = await res.user.save()
-        res.json(updatedUser)
+        res.json({
+            id: updatedUser._id,
+            name: updatedUser.name,
+            email: updatedUser.email,
+            password: updatedUser.password
+        })
     } catch (err) {
         res.status(400).json({message: err.message})
     }
@@ -57,8 +65,17 @@ router.post('/:id', getUser, async (req, res) => {
 
 //Getting all posts
 router.get('/posts/:id', getUser, async (req, res) => {
-    const postIds = res.user.posts
-    const posts = await PostSchema.find({_id: postIds})
+    const postsDbs = await PostSchema.find({creator: res.user._id})
+    const posts = postsDbs.map(post => {
+        return {
+            id: post._id,
+            creator: post.creator,
+            text: post.text,
+            creationDate: post.creationDate,
+            likes: post.likes,
+            dislikes: post.dislikes
+        }
+    })
     res.send(posts)
 })
 

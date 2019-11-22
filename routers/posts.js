@@ -88,7 +88,14 @@ router.post('/:id/edit', getPostDB, async (req, res) => {
     res.post.text = req.body.text
     try {
         const updatedPostDB = await res.post.save()
-        res.json(updatedPostDB)
+        res.json({
+            id: updatedPostDB._id,
+            text: updatedPostDB.text,
+            creator: updatedPostDB.creator,
+            creationDate: updatedPostDB.creationDate,
+            likes: updatedPostDB.likes,
+            dislikes: updatedPostDB.dislikes
+        })
     } catch (err) {
         res.status(400).json({message:err.message})
     }
@@ -114,11 +121,10 @@ router.post('/:id/edit/tags', getPostDB, async (req, res) => {
 
 //Deleting tags from post
 router.delete('/:id/edit/tags', getPostDB, async (req, res) => {
-    const postID = res.post._id
     const tags = req.body.tags.split(',')
     try {
         await TagSchema.deleteMany({title: tags})
-        res.send('Removed')
+        res.json('Removed')
     } catch (err) {
         res.status(400).json({message:err.message})
     }

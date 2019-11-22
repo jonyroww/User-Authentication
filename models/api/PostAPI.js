@@ -1,4 +1,4 @@
-
+const TagsAPI = require('./TagsAPI')
 
 function initFrom(post, user, tags) {
     return {
@@ -11,7 +11,7 @@ function initFrom(post, user, tags) {
         },
         likes: post.likes,
         dislikes: post.dislikes,
-        tags: tags
+        tags: TagsAPI.initFrom(tags)
     }
 }
 
