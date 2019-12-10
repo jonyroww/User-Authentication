@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const app = express()
+const cors = require('cors')
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true })
 const db = mongoose.connection
@@ -16,6 +17,11 @@ const postsRouter = require('./routers/posts')
 const tagsRouter = require('./routers/tags')
 const testRouter = require('./routers/test')
 
+const corsOptions = {
+    origin: 'http://localhost:1234',
+    optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(signUpRouter)
 app.use(signInRouter)

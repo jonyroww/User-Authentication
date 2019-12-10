@@ -27,7 +27,7 @@ function isValidPassword(pass) {
 }
 
 function isTokenValid(token) {
-  const email = jwt.verify(token,'pizdahuizhopa').email
+  const email = jwt.verify(token,'blablabla').email
   if (email === null) {
     throw new Error('Token is not valid')
   } else {

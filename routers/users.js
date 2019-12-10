@@ -10,12 +10,14 @@ const UserPostAPI = require('../models/api/UserPostAPI')
 const PostAPI = require('../models/api/PostAPI')
 const UserAPI = require('../models/api/UserAPI')
 
+
 //Getting all
-router.get('/', async (req, res) => {
+router.get('/',async (req, res) => {
     try {
         const users = await UserSchema.find()
         validationUtils.isTokenValid(req.headers['x-access-token'])
-        res.send(UserAPI.initFrom(users))
+        res.status(201).json(UserAPI.initFrom(users))
+
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -40,7 +42,7 @@ router.get('/:id', getUser, async (req, res) => {
 router.delete('/:id', getUser, async (req, res) => {
     try {
         await res.user.remove()
-        res.json({message: 'User deleted'})
+        res.status(200).json({message: 'User deleted'})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
