@@ -7,9 +7,9 @@ const validationUtils = require('../utils/validation-utils')
 
 // Sign-up
 router.post('/register', async (req,res) => {
-   const emailTrim = req.body.email.trim()
-   const doesUserExists = await UserSchema.findOne({ email: emailTrim})
-      try {
+    const emailTrim = req.body.email.trim()
+    const doesUserExists = await UserSchema.findOne({ email: emailTrim})
+    try {
         validationUtils.checkUserExists(doesUserExists)
         validationUtils.isValidEmail(req.body.email.trim())
         validationUtils.isValidName(req.body.name)
@@ -17,9 +17,9 @@ router.post('/register', async (req,res) => {
         const salt = await bcrypt.genSalt()
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
         const user = new UserSchema({
-          name: req.body.name,
-          email: req.body.email.trim(),
-          password: hashedPassword
+            name: req.body.name,
+            email: req.body.email.trim(),
+            password: hashedPassword
         })
         const newUser = await user.save()
         res.status(201).json({
@@ -28,9 +28,9 @@ router.post('/register', async (req,res) => {
             email: newUser.email,
             password: newUser.password
         })
-      } catch (err) {
-          res.status(500).json({message:err.message})
-      }
+    } catch (err) {
+        res.status(err.status).json({message:err.message})
+    }
 })
 
 

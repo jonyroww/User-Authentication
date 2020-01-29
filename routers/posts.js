@@ -19,12 +19,13 @@ router.get('/', async (req,res) => {
             const tagIDs = await PostTagsSchema.findOne({postID: post._id})
             const tags = await TagSchema.find({_id: tagIDs.tags})
             newPostDBs.push(PostAPI.initFrom(post, user, tags))
-        } 
+        }
         res.json(newPostDBs)
     } catch (err) {
         res.status(500).json({message:err.message})
     }
 })
+
 
 //Getting one post
 router.get('/:id', getPostDB, async (req, res) => {

@@ -16,10 +16,10 @@ router.get('/',async (req, res) => {
     try {
         const users = await UserSchema.find()
         validationUtils.isTokenValid(req.headers['x-access-token'])
-        res.status(201).json(UserAPI.initFrom(users))
+        res.status(200).json(UserAPI.initFrom(users))
 
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(err.status).json({message: err.message})
     }
 })
 

@@ -26,7 +26,7 @@ app.use(express.json())
 app.use(signUpRouter)
 app.use(signInRouter)
 app.use('/users', usersRouter)
-app.use('/posts',postsRouter)
+app.use('/posts', postsRouter)
 app.use('/tags',tagsRouter)
 app.use(testRouter)
 
